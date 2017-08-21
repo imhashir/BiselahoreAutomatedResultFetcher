@@ -11,18 +11,18 @@ file = open("input/" + inputFilename, "r")
 workbook = xlsxwriter.Workbook("output/" + outFilename + '.xlsx')
 worksheet = workbook.add_worksheet()
 
-subCount = 8
 x = 0
 
 worksheet.write(0, 0, "RollNo")
-worksheet.write(0, 1, "URDU")
-worksheet.write(0, 2, "ENGLISH")
-worksheet.write(0, 3, "ISLAMIYAT")
-worksheet.write(0, 4, "PAK STUDIES")
-worksheet.write(0, 5, "MATHS")
-worksheet.write(0, 6, "PHYSICS")
-worksheet.write(0, 7, "CHEMISTRY")
-worksheet.write(0, 8, "COMPUTER")
+worksheet.write(0, 1, "Name")
+worksheet.write(0, 2, "URDU")
+worksheet.write(0, 3, "ENGLISH")
+worksheet.write(0, 4, "ISLAMIYAT")
+worksheet.write(0, 5, "PAK STUDIES")
+worksheet.write(0, 6, "MATHS")
+worksheet.write(0, 7, "PHYSICS")
+worksheet.write(0, 8, "CHEMISTRY")
+worksheet.write(0, 9, "COMPUTER")
 
 row = 1
 col = 0
@@ -39,6 +39,8 @@ for line in file:
 	print("Rollno" + line)
 	worksheet.write(row, col, line)
 	col = col + 1
+	worksheet.write(row, col, browser.find_by_tag('td')[8].text)
+	col = col + 1
 	for index in range(8):
 		worksheet.write(row, col, browser.find_by_tag('td')[24 + (index*3)].text)
 		col = col + 1
@@ -46,7 +48,6 @@ for line in file:
 		#print(browser.find_by_tag('td')[24 + (index*3)].text + "\n")
 	col = 0
 	row = row + 1
-	print("\n\n")
 	browser.windows.current = browser.windows[0]
 	browser.windows[1].close()
 
