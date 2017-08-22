@@ -2,8 +2,6 @@ from splinter import Browser
 from splinter import exceptions
 
 import xlsxwriter
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 
 inputFilename = input("Enter Input Filename: ")
 outFilename = input("Enter Output Filename: ")
@@ -29,25 +27,23 @@ row = 1
 col = 0
 
 browser = Browser()
-browser.visit('http://www.biselahore.com/')
+browser.visit('http://result.biselahore.com/')
+
 for line in file:
-	browser.fill('student_rno', line)
-	browser.find_by_name('submit').click()
-	browser.windows.current = browser.windows[1]
+	browser.fill('rollNum', line)
+	browser.find_by_value("View Result").click()
 	print("Rollno" + line)
-	worksheet.write(row, col, int(line))
+	worksheet.write(row, col, str(line))
 	col = col + 1
 	
 	retry = True
 	while retry:
 		try:
-			worksheet.write(row, col, browser.find_by_tag('td')[8].text)
+			worksheet.write(row, col, browser.find_by_tag('td')[11].text)
 			retry = False
 		except IndexError:
-			print("Retrying Name...")
 			retry = True
 		except exceptions.ElementDoesNotExist:
-			print("Retrying Name...")
 			retry = True
 	
 	col = col + 1
@@ -55,7 +51,7 @@ for line in file:
 		retry = True
 		while retry:
 			try:
-				worksheet.write(row, col, int(browser.find_by_tag('td')[24 + (index*3)].text))
+				worksheet.write(row, col, int(browser.find_by_tag('td')[26 + (index*4)].text))
 			except IndexError:
 				retry = True
 			except exceptions.ElementDoesNotExist:
@@ -66,8 +62,7 @@ for line in file:
 		col = col + 1
 	col = 0
 	row = row + 1
-	browser.windows.current = browser.windows[0]
-	browser.windows[1].close()
+	browser.back()
 
 workbook.close()
 browser.quit()
