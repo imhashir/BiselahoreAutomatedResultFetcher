@@ -1,15 +1,26 @@
 from splinter import Browser
 from splinter import exceptions
-
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 from xlsxwriter.utility import xl_col_to_name
+import os, sys
+
+if os.path.isdir("input") == False:
+	os.mkdir("input")
+if os.path.isdir("output") == False: 
+	os.mkdir("output")
 
 inputFilename = input("Enter Input Filename: ")
 outFilename = input("Enter Output Filename: ")
 
 print("Preparing Spreadsheet...")
-file = open("input/" + inputFilename, "r")
+
+try:
+	file = open("input/" + inputFilename, "r")
+except FileNotFoundError:
+	print("No file named '" + inputFilename + "' exists in folder 'input'")
+	sys.exit()
+	
 workbook = xlsxwriter.Workbook("output/" + outFilename + '.xlsx')
 worksheet = workbook.add_worksheet()
 
