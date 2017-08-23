@@ -6,28 +6,27 @@ import xlsxwriter
 inputFilename = input("Enter Input Filename: ")
 outFilename = input("Enter Output Filename: ")
 
+print("Preparing Spreadsheet...")
 file = open("input/" + inputFilename, "r")
 workbook = xlsxwriter.Workbook("output/" + outFilename + '.xlsx')
 worksheet = workbook.add_worksheet()
 
 x = 0
-
-worksheet.write(0, 0, "RollNo")
-worksheet.write(0, 1, "Name")
-worksheet.write(0, 2, "URDU")
-worksheet.write(0, 3, "ENGLISH")
-worksheet.write(0, 4, "ISLAMIYAT")
-worksheet.write(0, 5, "PAK STUDIES")
-worksheet.write(0, 6, "MATHS")
-worksheet.write(0, 7, "PHYSICS")
-worksheet.write(0, 8, "CHEMISTRY")
-worksheet.write(0, 9, "COMPUTER")
-
 row = 1
 col = 0
 
+print("Initiating Automation...\n")
 browser = Browser()
 browser.visit('http://result.biselahore.com/')
+browser.fill('rollNum', file.readline())
+browser.find_by_value("View Result").click()
+file.seek(0)
+
+for i in range(8):
+	worksheet.write(0, i + 2, browser.find_by_tag('td')[24 + i*4].text)
+browser.back()
+
+print("Fetching Result Data...\n")
 
 for line in file:
 	browser.fill('rollNum', line)
