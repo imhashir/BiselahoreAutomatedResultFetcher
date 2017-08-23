@@ -3,6 +3,7 @@ from splinter import exceptions
 
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
+from xlsxwriter.utility import xl_col_to_name
 
 inputFilename = input("Enter Input Filename: ")
 outFilename = input("Enter Output Filename: ")
@@ -25,6 +26,8 @@ file.seek(0)
 
 worksheet.write(0, 0, "Roll No")
 worksheet.write(0, 1, "Name")
+worksheet.set_column(xl_col_to_name(1) + ":" + xl_col_to_name(1), 24)
+
 for i in range(8):
 	worksheet.write(0, i + 2, browser.find_by_tag('td')[24 + i*4].text)
 worksheet.write(0, 10, "Total")
