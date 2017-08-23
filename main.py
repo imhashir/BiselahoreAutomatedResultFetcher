@@ -22,6 +22,8 @@ browser.fill('rollNum', file.readline())
 browser.find_by_value("View Result").click()
 file.seek(0)
 
+worksheet.write(0, 0, "Roll No")
+worksheet.write(0, 1, "Name")
 for i in range(8):
 	worksheet.write(0, i + 2, browser.find_by_tag('td')[24 + i*4].text)
 browser.back()
