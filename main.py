@@ -2,6 +2,7 @@ from splinter import Browser
 from splinter import exceptions
 
 import xlsxwriter
+from xlsxwriter.utility import xl_rowcol_to_cell
 
 inputFilename = input("Enter Input Filename: ")
 outFilename = input("Enter Output Filename: ")
@@ -26,6 +27,7 @@ worksheet.write(0, 0, "Roll No")
 worksheet.write(0, 1, "Name")
 for i in range(8):
 	worksheet.write(0, i + 2, browser.find_by_tag('td')[24 + i*4].text)
+worksheet.write(0, 10, "Total")
 browser.back()
 
 print("Fetching Result Data...\n")
@@ -59,8 +61,8 @@ for line in file:
 				retry = True
 			else:
 				retry = False
-				
 		col = col + 1
+	worksheet.write(row, col, "=SUM(" + xl_rowcol_to_cell(row, 2) + ":" + xl_rowcol_to_cell(row, col - 1) + ")")
 	col = 0
 	row = row + 1
 	browser.back()
