@@ -14,7 +14,7 @@ This is a Python based tool tested and working on Python 3.6 with following modu
 
 # How to Use
   - Firefox browser installed
-  - You need Python3 installation in your machine along with all the modules mentioned in "How does it work" section.
+  - You need Python3 installation in your machine along with all the modules mentioned in "Details" section.
   - Then open command windows/terminal in project directory and type:
     ```sh
     python main.py
