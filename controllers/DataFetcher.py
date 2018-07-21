@@ -71,7 +71,13 @@ class DataFetcher:
                         try:
                             worksheet.write(row, col, int(marks))
                         except ValueError:
-                            worksheet.write(row, col, 0)
+                            marks = 0
+                            for i in range(3):
+                                try:
+                                    marks = marks + int(browser.find_by_tag('td')[i + 27 + (index * 6)].text)
+                                except ValueError:
+                                    continue
+                            worksheet.write(row, col, marks)
                     except IndexError:
                         retry = True
                     except exceptions.ElementDoesNotExist:
