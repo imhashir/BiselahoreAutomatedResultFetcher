@@ -25,10 +25,10 @@ class DataFetcher:
         col = 0
 
         print("Initiating Automation...\n")
-        browser = Browser()
-        browser.visit('http://biselahore.com/')
-        browser.fill('student_rno', file.readline())
-        browser.find_by_value("Get Result").click()
+        browser = Browser('firefox')
+        browser.visit('http://result.biselahore.com/')
+        browser.fill('rollNum', file.readline())
+        browser.find_by_value("View Result").click()
         file.seek(0)
 
         worksheet.write(0, 0, "Roll No")
@@ -36,7 +36,7 @@ class DataFetcher:
         worksheet.set_column(xl_col_to_name(1) + ":" + xl_col_to_name(1), 24)
 
         for i in range(8):
-            word = browser.find_by_tag('td')[26 + i * 6].text
+            word = browser.find_by_tag('td')[31 + i * 9].text
             worksheet.write(0, i + 2, word)
         worksheet.write(0, 10, "Total")
         browser.back()
@@ -44,8 +44,8 @@ class DataFetcher:
         print("Fetching Result Data...\n")
 
         for line in file:
-            browser.fill('student_rno', line)
-            browser.find_by_value("Get Result").click()
+            browser.fill('rollNum', line)
+            browser.find_by_value("View Result").click()
             print("Rollno: " + line)
             worksheet.write(row, col, str(line))
             col = col + 1
@@ -53,7 +53,7 @@ class DataFetcher:
             retry = True
             while retry:
                 try:
-                    name = browser.find_by_tag('td')[8].text
+                    name = browser.find_by_tag('td')[11].text
                     print(name)
                     worksheet.write(row, col, name)
                     retry = False
@@ -67,14 +67,14 @@ class DataFetcher:
                 retry = True
                 while retry:
                     try:
-                        marks = browser.find_by_tag('td')[30 + (index * 6)].text
+                        marks = browser.find_by_tag('td')[38 + (index * 9)].text
                         try:
                             worksheet.write(row, col, int(marks))
                         except ValueError:
                             marks = 0
                             for i in range(3):
                                 try:
-                                    marks = marks + int(browser.find_by_tag('td')[i + 27 + (index * 6)].text)
+                                    marks = marks + int(browser.find_by_tag('td')[i + 35 + (index * 9)].text)
                                 except ValueError:
                                     continue
                             worksheet.write(row, col, marks)
