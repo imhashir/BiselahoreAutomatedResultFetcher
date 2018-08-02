@@ -18,7 +18,7 @@ class DataFetcher:
             sys.exit()
 
         workbook = xlsxwriter.Workbook("output/" + outputFilename + '.xlsx')
-        worksheet = workbook.add_worksheet()
+        worksheets = [workbook.add_worksheet('Computer'), workbook.add_worksheet('Biology')]
 
         x = 0
         row = 1
@@ -31,14 +31,24 @@ class DataFetcher:
         browser.find_by_value("View Result").click()
         file.seek(0)
 
-        worksheet.write(0, 0, "Roll No")
-        worksheet.write(0, 1, "Name")
-        worksheet.set_column(xl_col_to_name(1) + ":" + xl_col_to_name(1), 24)
+        for worksheet in worksheets:
+            worksheet.write(0, 0, "Roll No")
+            worksheet.write(0, 1, "Name")
+            worksheet.set_column(xl_col_to_name(1) + ":" + xl_col_to_name(1), 24)
 
-        for i in range(8):
+        row_comp = 1
+        row_bio = 1
+
+        for i in range(7):
             word = browser.find_by_tag('td')[31 + i * 9].text
-            worksheet.write(0, i + 2, word)
-        worksheet.write(0, 10, "Total")
+            for worksheet in worksheets:
+                worksheet.write(0, i + 2, word)
+
+        worksheets[0].write(0, 9, "COMPUTER")
+        worksheets[1].write(0, 9, "BIOLOGY")
+
+        for worksheet in worksheets:
+            worksheet.write(0, 10, "Total")
         browser.back()
 
         print("Fetching Result Data...\n")
@@ -47,6 +57,24 @@ class DataFetcher:
             browser.fill('rollNum', line)
             browser.find_by_value("View Result").click()
             print("Rollno: " + line)
+
+            retry = True
+            while retry:
+                try:
+                    elective_sub = browser.find_by_tag('td')[31 + 7 * 9].text
+                    retry = False
+                except IndexError:
+                    retry = True
+                except exceptions.ElementDoesNotExist:
+                    retry = True
+
+            if 'COMPUTER SCIENCE'.lower() in elective_sub.lower():
+                row = row_comp
+                worksheet = worksheets[0]
+            else:
+                worksheet = worksheets[1]
+                row = row_bio
+
             worksheet.write(row, col, str(line))
             col = col + 1
 
@@ -88,6 +116,12 @@ class DataFetcher:
             worksheet.write(row, col, "=SUM(" + xl_rowcol_to_cell(row, 2) + ":" + xl_rowcol_to_cell(row, col - 1) + ")")
             col = 0
             row = row + 1
+
+            if 'COMPUTER SCIENCE'.lower() in elective_sub.lower():
+                row_comp = row
+            else:
+                row_bio = row
+
             browser.back()
 
         workbook.close()
