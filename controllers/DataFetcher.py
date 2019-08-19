@@ -101,6 +101,10 @@ class DataFetcher:
                         worksheet.write(row, col, int(marks))
                     except IndexError:
                         retry = True
+                    except ValueError:
+                        marks = 0
+                        worksheet.write(row, col, int(marks))
+                        retry = False
                     except exceptions.ElementDoesNotExist:
                         retry = True
                     else:
