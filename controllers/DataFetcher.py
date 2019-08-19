@@ -4,7 +4,7 @@ import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 from xlsxwriter.utility import xl_col_to_name
 import sys
-
+from time import sleep
 
 class DataFetcher:
 
@@ -25,10 +25,11 @@ class DataFetcher:
         col = 0
 
         print("Initiating Automation...\n")
-        browser = Browser('firefox')
-        browser.visit('http://result.biselahore.com/')
-        browser.fill('rollNum', file.readline())
-        browser.find_by_value("View Result").click()
+        browser = Browser('chrome')
+        browser.visit('http://biselahore.com/')
+        browser.fill('student_rno', file.readline())
+        sleep(0.5)
+        # browser.find_by_xpath('//*[@id="main-wrapper"]/div[2]/ul/li/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td/input').click()
         file.seek(0)
 
         for worksheet in worksheets:
@@ -38,9 +39,8 @@ class DataFetcher:
 
         row_comp = 1
         row_bio = 1
-
         for i in range(7):
-            word = browser.find_by_tag('td')[31 + i * 9].text
+            word = browser.find_by_xpath('/html/body/div/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[{}]/td[1]'.format(2 + i)).text
             for worksheet in worksheets:
                 worksheet.write(0, i + 2, word)
 
@@ -54,14 +54,16 @@ class DataFetcher:
         print("Fetching Result Data...\n")
 
         for line in file:
-            browser.fill('rollNum', line)
-            browser.find_by_value("View Result").click()
+            browser.fill('student_rno', line.strip())
+
+            browser.find_by_xpath(
+                '//*[@id="main-wrapper"]/div[2]/ul/li/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td/input').click()
             print("Rollno: " + line)
 
             retry = True
             while retry:
                 try:
-                    elective_sub = browser.find_by_tag('td')[31 + 7 * 9].text
+                    elective_sub = browser.find_by_xpath('/html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[9]/td[1]').text
                     retry = False
                 except IndexError:
                     retry = True
@@ -77,11 +79,10 @@ class DataFetcher:
 
             worksheet.write(row, col, str(line))
             col = col + 1
-
             retry = True
             while retry:
                 try:
-                    name = browser.find_by_tag('td')[11].text
+                    name = browser.find_by_xpath('/html/body/div[1]/ul/li/table[1]/tbody/tr[3]/td/table/tbody/tr[2]/td[3]').text
                     print(name)
                     worksheet.write(row, col, name)
                     retry = False
@@ -89,23 +90,15 @@ class DataFetcher:
                     retry = True
                 except exceptions.ElementDoesNotExist:
                     retry = True
-
+            # /html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[2]/td[2]
+            # /html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[3]/td[2]
             col = col + 1
             for index in range(8):
                 retry = True
                 while retry:
                     try:
-                        marks = browser.find_by_tag('td')[38 + (index * 9)].text
-                        try:
-                            worksheet.write(row, col, int(marks))
-                        except ValueError:
-                            marks = 0
-                            for i in range(3):
-                                try:
-                                    marks = marks + int(browser.find_by_tag('td')[i + 35 + (index * 9)].text)
-                                except ValueError:
-                                    continue
-                            worksheet.write(row, col, marks)
+                        marks = browser.find_by_xpath('/html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[{}]/td[2]'.format(2 + index)).text
+                        worksheet.write(row, col, int(marks))
                     except IndexError:
                         retry = True
                     except exceptions.ElementDoesNotExist:
