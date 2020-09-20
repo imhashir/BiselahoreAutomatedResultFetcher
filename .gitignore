@@ -1,4 +1,5 @@
 input/
 output/
 geckodriver.log
-*.txt
+/.idea/
+/venv/
