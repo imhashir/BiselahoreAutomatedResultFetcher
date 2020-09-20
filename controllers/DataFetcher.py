@@ -6,6 +6,8 @@ from xlsxwriter.utility import xl_col_to_name
 import sys
 from time import sleep
 
+SITE_URL = 'http://biselahore.com/SSC_A20.html'
+
 class DataFetcher:
 
     def fetchData(self, inputFilename, outputFilename):
@@ -18,15 +20,13 @@ class DataFetcher:
             sys.exit()
 
         workbook = xlsxwriter.Workbook("output/" + outputFilename + '.xlsx')
-        worksheets = [workbook.add_worksheet('Computer'), workbook.add_worksheet('Biology')]
+        worksheets = [workbook.add_worksheet('Computer'), workbook.add_worksheet('Biology'), workbook.add_worksheet('Other')]
 
-        x = 0
-        row = 1
         col = 0
 
         print("Initiating Automation...\n")
         browser = Browser('chrome')
-        browser.visit('http://biselahore.com/')
+        browser.visit(SITE_URL)
         browser.fill('student_rno', file.readline())
         sleep(0.5)
         # browser.find_by_xpath('//*[@id="main-wrapper"]/div[2]/ul/li/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td/input').click()
@@ -39,6 +39,7 @@ class DataFetcher:
 
         row_comp = 1
         row_bio = 1
+        row_other = 1
         for i in range(7):
             word = browser.find_by_xpath('/html/body/div/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[{}]/td[1]'.format(2 + i)).text
             for worksheet in worksheets:
@@ -46,6 +47,7 @@ class DataFetcher:
 
         worksheets[0].write(0, 9, "COMPUTER")
         worksheets[1].write(0, 9, "BIOLOGY")
+        worksheets[1].write(0, 9, "OTHER")
 
         for worksheet in worksheets:
             worksheet.write(0, 10, "Total")
@@ -73,9 +75,12 @@ class DataFetcher:
             if 'COMPUTER SCIENCE'.lower() in elective_sub.lower():
                 row = row_comp
                 worksheet = worksheets[0]
-            else:
+            elif 'BIOLOGY'.lower() in elective_sub.lower():
                 worksheet = worksheets[1]
                 row = row_bio
+            else:
+                worksheet = worksheets[2]
+                row = row_other
 
             worksheet.write(row, col, str(line))
             col = col + 1
@@ -97,7 +102,7 @@ class DataFetcher:
                 retry = True
                 while retry:
                     try:
-                        marks = browser.find_by_xpath('/html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[{}]/td[2]'.format(2 + index)).text
+                        marks = browser.find_by_xpath('/html/body/div[1]/ul/li/table[1]/tbody/tr[5]/td/table/tbody/tr[{}]/td[5]'.format(2 + index)).text
                         worksheet.write(row, col, int(marks))
                     except IndexError:
                         retry = True
